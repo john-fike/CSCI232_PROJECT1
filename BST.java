@@ -5,6 +5,12 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 
+/*
+* Authors:
+* Sarah Dolan
+* John Fike (-02909708)
+* */
+
 public class BST {
     Node root;
     Node current;
@@ -13,6 +19,11 @@ public class BST {
        root = current = null;
     }
 
+    ////////////////////////////////////////////////////////////////////
+    //insert method provided by Sean Yaw
+    //reconfigured slightly to create a tree based on inOrder indicies
+    //and names (instead of ints)
+    ////////////////////////////////////////////////////////////////////
     public void insert(int newValue) {
         if (root == null) {
             root = new Node(Integer.toString(newValue));

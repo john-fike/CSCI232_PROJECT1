@@ -1,10 +1,17 @@
 import java.util.Scanner;
+/*
+ * Authors:
+ * Sarah Dolan
+ * John Fike (s94n685)
+ * */
+
 public class Main
 {
     public static void main(String[] args)
     {
         Scanner inputScanner = new Scanner(System.in);
 
+        //create tree, load it with either a default tree or a tree from a previous training session
         BST bst = new BST();
         System.out.println("Loading last session...");
         try{
@@ -18,8 +25,6 @@ public class Main
                 System.exit(1);
             }
         }
-
-
         bst.printTree();
 
         System.out.println("Do you have a new plant to be identified (Y/N)");
@@ -30,9 +35,7 @@ public class Main
             System.out.println("Do you have a new plant to be identified (Y/N)");
             userInput = inputScanner.nextLine().toUpperCase();
         }
-
         System.out.println("Thanks for playing");
         bst.writeToFile();
     }
-
 }
