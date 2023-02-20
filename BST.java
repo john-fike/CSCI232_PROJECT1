@@ -1,9 +1,47 @@
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.PrintWriter;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class BST {
     Node root;
+
     public BST() {
        root = null;
+    }
+
+    public void insert(int newValue) {
+        if (root == null) {
+            root = new Node(Integer.toString(newValue));
+        } else {
+            Node currentNode = root;
+            boolean placed = false;
+            while (!placed) {
+                if (newValue == Integer.parseInt(currentNode.getName())) {
+                    placed = true;
+                    // Don't insert repeated value.
+                } else if (newValue < Integer.parseInt(currentNode.getName())) {
+                    if (currentNode.getLeft() == null) {
+                        currentNode.setLeft(new Node(Integer.toString(newValue)));
+                        currentNode.getLeft().setParent(currentNode);
+                        placed = true;
+                    } else {
+                        currentNode = currentNode.getLeft();
+                    }
+                } else {
+                    if (currentNode.getRight() == null) {
+                        currentNode.setRight(new Node(Integer.toString(newValue)));
+                        currentNode.getRight().setParent(currentNode);
+                        placed = true;
+                    } else {
+                        currentNode = currentNode.getRight();
+                    }
+                }
+            }
+        }
     }
 
     public void getAnswer(Node current)
@@ -59,8 +97,7 @@ public class BST {
         }
     }
 
-    public String getLocation(Node current)
-    {
+    public String getLocation(Node current) {
         String chars = "";
         while(current.getParent() != null)
         {
@@ -76,5 +113,97 @@ public class BST {
             }
         }
         return chars;
+    }
+
+    ////////////////////////////////////////////////////////////////////
+    //prints tree breadth-wise on one line, separated by spaces
+    ////////////////////////////////////////////////////////////////////
+    public void printTree(){
+        Queue<Node> queue = new LinkedList<>();
+        if (root != null) {
+            queue.add(root);
+            while (!queue.isEmpty()) {
+                Node node = queue.remove();
+                System.out.print(node.getName() + " ");
+                if (node.getLeft() != null) {
+                    queue.add(node.getLeft());
+                }
+                if (node.getRight() != null) {
+                    queue.add(node.getRight());
+                }
+            }
+            System.out.println();
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////
+    //-loads in tree from 2 lines of CSVs stored in file fileName
+    //-nodeNames[] holds names of nodes in inorder order
+    //-insert() is then used to insert the nodes using the values from the
+    //second line of CSVs. These are the values created by reNumber.
+    //-Each node is then assigned its corresponding name in nodeNames[]
+    //////////////////////////////////////////////////////////////////////
+    public void loadFromFile(String fileName) {
+        try {
+            FileReader file = new FileReader(fileName);
+            Scanner inFile = new Scanner(file);
+            String[] nodeNames;
+
+            String loadedInNames = inFile.nextLine();
+            System.out.println("Loading: " + loadedInNames);
+            nodeNames = loadedInNames.split(",");
+
+            //load next CSV line
+            String treeOrder = inFile.nextLine();
+            System.out.println("Loading: " + treeOrder);
+            String[] tokens = treeOrder.split(",");
+            for (String s : tokens){
+                try{
+                    System.out.println("Inserting: " + nodeNames[Integer.parseInt(s)]);
+                    insert(Integer.parseInt(s));
+                }catch (Exception e){
+                    System.out.println("File formatted incorrectly! :(");
+                }
+            }
+            inFile.close();
+            Queue<Node> queue = new LinkedList<>();
+            if (root != null) {
+                queue.add(root);
+                while (!queue.isEmpty()) {
+                    Node node = queue.remove();
+                    node.setName(nodeNames[Integer.parseInt(node.getName())]);
+                    if (node.getLeft() != null) {
+                        queue.add(node.getLeft());
+                    }
+                    if (node.getRight() != null) {
+                        queue.add(node.getRight());
+                    }
+                }
+                System.out.println();
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found! :(");
+        }
+    }
+
+    public void writeToFile(){
+        Queue<Node> queue = new LinkedList<>();
+        try {
+            PrintWriter outFile = new PrintWriter("dynamicSaveTree.txt");
+            if (root != null) {
+                queue.add(root);
+                while (!queue.isEmpty()) {
+                    Node node = queue.remove();
+                    System.out.println("Writing " + node.getName() + " to file...");
+                    outFile.print(node.getName() + ",");
+                    System.out.println("Successfully wrote to the file.");
+                    if(node.getLeft()!=null){queue.add(node.getLeft());}
+                    if(node.getRight()!=null){queue.add(node.getRight());}
+                }
+            }
+            outFile.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found!");
+        }
     }
 }

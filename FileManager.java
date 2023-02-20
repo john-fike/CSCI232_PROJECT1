@@ -11,16 +11,4 @@ public class FileManager
     {
         root = null;
     }
-
-    public void writeToFile()
-    {
-    }
-
-    public void loadFromFile() {
-    }
-
-    private void insert() {
-    }
-
-
 }
