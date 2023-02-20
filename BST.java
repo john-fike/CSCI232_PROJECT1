@@ -4,13 +4,13 @@ import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
-import java.util.ArrayList;
 
 public class BST {
     Node root;
-
+    Node current;
+    int inOrderCount;
     public BST() {
-       root = null;
+       root = current = null;
     }
 
     public void insert(int newValue) {
@@ -44,57 +44,55 @@ public class BST {
         }
     }
 
-    public void getAnswer(Node current)
+    public void getAnswer()
     {
-        Scanner in = new Scanner(System.in);
-
-        //not empty
-        if (current != null) {
-            System.out.println("Is your plant " + current.getName() + " Y/N");
-            String answer = in.nextLine();
+        Scanner inputScanner = new Scanner(System.in);
+            System.out.println("Is your plant a " + current.getName() + " Y/N");
+            String userInput = inputScanner.nextLine().toUpperCase();
 
             //is response Y or N
-            if (answer.equals("Y"))
+            if (userInput.equals("Y"))
             {
                 //the current has a left child(Is the characteristic and will now pass through yes characteristic/plant)
                 if (current.getLeft() != null)
                 {
-                    getAnswer(current.getLeft());
+                    current = current.getLeft();
+                    getAnswer();
                 }
                 //if current is yes and does not have a yes child, it must be a leaf
                 else if (current.getLeft() == null){
                     System.out.println("Great");
+                    current = root;
                 }
 
             //N response must mean it moves to the right
-            } else if (answer.equals("N")) {
+            } else if (userInput.equals("N")) {
                 //if it has a right child(N), pass through the ne characteristic
                 if (current.getRight() != null)
                 {
-                    getAnswer(current.getRight());
+                    current = current.getRight();
+                    getAnswer();
                 }
-                //current does not have a right child, will ask to identify new plant
+                //current does not have a right child,  ask to identify new plant
                 else if (current.getRight() == null)
                 {
                     String location = getLocation(current);
                     String original = current.getName();
 
                     System.out.println("I do not know any " +  location + "plants that is not a " + original);
-                    System.out.println("What is the plant you are thinking of");
-                    String name = in.nextLine();
+                    System.out.println("What is the plant you are thinking of?");
+                    String name = inputScanner.nextLine();
                     System.out.println("What characteristic does a " + name + " have that " + original + " does not have?");
-                    String character = in.nextLine();
+                    String character = inputScanner.nextLine();
 
                     //rearranges the last three part of the tree, current and children
                     current.setName(character);
                     current.setLeft(new Node(name));
                     current.setRight(new Node(original));
-
-                    //getAnswer(root);
-                    //should go back to while loop
+                    current = root;
                 }
             } else {System.out.println("Not a valid response");}
-        }
+
     }
 
     public String getLocation(Node current) {
@@ -138,9 +136,10 @@ public class BST {
 
     ////////////////////////////////////////////////////////////////////
     //-loads in tree from 2 lines of CSVs stored in file fileName
-    //-nodeNames[] holds names of nodes in inorder order
-    //-insert() is then used to insert the nodes using the values from the
-    //second line of CSVs. These are the values created by reNumber.
+    //-nodeNames[] holds names of nodes in breadth-wise order
+    //-insert() is then used to insert the nodes in the correct order by
+    //using the values from the second line of CSVs. These are the
+    //values created by reNumber.
     //-Each node is then assigned its corresponding name in nodeNames[]
     //////////////////////////////////////////////////////////////////////
     public void loadFromFile(String fileName) {
@@ -169,16 +168,19 @@ public class BST {
             Queue<Node> queue = new LinkedList<>();
             if (root != null) {
                 queue.add(root);
+                int bredthCounter=0;
                 while (!queue.isEmpty()) {
                     Node node = queue.remove();
-                    node.setName(nodeNames[Integer.parseInt(node.getName())]);
+                    node.setName(nodeNames[bredthCounter]);
                     if (node.getLeft() != null) {
                         queue.add(node.getLeft());
                     }
                     if (node.getRight() != null) {
                         queue.add(node.getRight());
                     }
+                    bredthCounter++;
                 }
+                current = root;
                 System.out.println();
             }
         } catch (FileNotFoundException e) {
@@ -196,14 +198,42 @@ public class BST {
                     Node node = queue.remove();
                     System.out.println("Writing " + node.getName() + " to file...");
                     outFile.print(node.getName() + ",");
-                    System.out.println("Successfully wrote to the file.");
                     if(node.getLeft()!=null){queue.add(node.getLeft());}
                     if(node.getRight()!=null){queue.add(node.getRight());}
                 }
+                System.out.println();
+                outFile.println();
+                reNumber();
+                queue.add(root);
+                while (!queue.isEmpty()) {
+                    Node node = queue.remove();
+                    System.out.println("Writing " + node.getName() + " to file...");
+                    outFile.print(node.getName() + ",");
+                    if(node.getLeft()!=null){queue.add(node.getLeft());}
+                    if(node.getRight()!=null){queue.add(node.getRight());}
+                }
+                System.out.println("Save Complete\n");
             }
             outFile.close();
         } catch (FileNotFoundException e) {
             System.out.println("File not found!");
         }
     }
+
+    public void reNumber(Node node){
+        if(node!=null){
+            reNumber(node.getLeft());
+            System.out.println("Current node name: " + node.getName());
+            node.setName(Integer.toString(inOrderCount));
+            System.out.println("Set val to: " + inOrderCount);
+            inOrderCount++;
+            reNumber(node.getRight());
+        }
+    }
+    public void reNumber() {
+        inOrderCount = 0;
+        reNumber(root);
+    }
+
+
 }
