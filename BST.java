@@ -140,22 +140,28 @@ public class BST {
     //-insert() is then used to insert the nodes in the correct order by
     //using the values from the second line of CSVs. These are the
     //values created by reNumber.
-    //-Each node is then assigned its corresponding name in nodeNames[]
+    //-The resultant tree is then iterated through breadth-wise and given
+    //the correct name, overwriting inOrder values they wre originally
+    //assigned
     //////////////////////////////////////////////////////////////////////
     public void loadFromFile(String fileName) {
         try {
+            //open file to be loaded from
             FileReader file = new FileReader(fileName);
             Scanner inFile = new Scanner(file);
             String[] nodeNames;
 
+            //grab names from first line and put them into nodeNames[]
             String loadedInNames = inFile.nextLine();
             System.out.println("Loading: " + loadedInNames);
             nodeNames = loadedInNames.split(",");
 
-            //load next CSV line
+            //load next line of CSVs (inOrder indices)
             String treeOrder = inFile.nextLine();
             System.out.println("Loading: " + treeOrder);
             String[] tokens = treeOrder.split(",");
+
+            //iterate through and use insert() to recreate a tree with the correct structure
             for (String s : tokens){
                 try{
                     System.out.println("Inserting: " + nodeNames[Integer.parseInt(s)]);
@@ -165,6 +171,8 @@ public class BST {
                 }
             }
             inFile.close();
+
+            //iterate through the tree we just created, breadth-wise, and assign names to all the nodes using nodeNames[]
             Queue<Node> queue = new LinkedList<>();
             if (root != null) {
                 queue.add(root);
@@ -180,6 +188,7 @@ public class BST {
                     }
                     bredthCounter++;
                 }
+                //set up current pointer for first getAnswer session
                 current = root;
                 System.out.println();
             }
@@ -188,6 +197,14 @@ public class BST {
         }
     }
 
+    //////////////////////////////////////////////////////////////////////
+    //writes names to dynamicSaveTree.txt in breadthwise order
+    //calls reNumber()
+    //writes names (now the inOrder indices) again, one line down.
+    //THIS METHOD RENAMES ALL NODES AND SHOULD ONLY BE CALLED AT THE END
+    // OF A TRAINING SESSION
+    // THIS METHOD ALWAYS WRITES TO A FILE CALLED "dynamicSaveTree.txt"
+    //////////////////////////////////////////////////////////////////////
     public void writeToFile(){
         Queue<Node> queue = new LinkedList<>();
         try {
@@ -220,6 +237,7 @@ public class BST {
         }
     }
 
+    //reassign name of nodes to their inOrder index (same as lab 4)
     public void reNumber(Node node){
         if(node!=null){
             reNumber(node.getLeft());
