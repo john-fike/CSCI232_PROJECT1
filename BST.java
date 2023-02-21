@@ -7,8 +7,8 @@ import java.util.Scanner;
 
 /*
 * Authors:
-* Sarah Dolan
-* John Fike (-02909708)
+* Sarah Dolan (b93n684)
+* John Fike (s94n685)
 * */
 
 public class BST {
